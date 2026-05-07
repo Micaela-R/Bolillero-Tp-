@@ -6,10 +6,9 @@ namespace TestBolilleros
 {
     public class UnitTest1
     {
-        // ─── TP1: Tests del Bolillero ───────────────────────────────────────────────
 
         [Fact]
-        public void SacarBolilla_DevuelveBolillaCero_YActualizaCantidades()
+        public void SacarBolilla_DevuelveBolillaCero_YActualizaCantidades() //Se crea el objeto tomando en cuenta la clase "Boliullero", esto verifica las bolillas fuera y dentro del bolillero
         {
             Bolillero miBolillero = new Bolillero(10, new AzarFijo(0));
 
@@ -21,8 +20,9 @@ namespace TestBolilleros
         }
 
         [Fact]
-        public void ReingresarBolillas_DespuesDeSacarUna_VuelveA10()
+        public void ReingresarBolillas_DespuesDeSacarUna_VuelveA10() 
         {
+            //Se reingresan las bolillas, verificando que la cantidad dentro sea la inicial 
             Bolillero miBolillero = new Bolillero(10, new AzarFijo(0));
 
             miBolillero.SacarBolilla();
@@ -35,7 +35,7 @@ namespace TestBolilleros
         [Fact]
         public void Jugar_JugadaGanadora_0123_Gana()
         {
-            // AzarFijo(0) siempre saca el índice 0: con el bolillero ordenado [0,1,2,3...] saca 0, luego 1, luego 2, luego 3
+            //Se verifica la jugada ganadora, verificando que la jugada seleccionada sea igual a las bolillas sacadas por el bolillero
             Bolillero miBolillero = new Bolillero(10, new AzarFijo(0));
             List<int> jugada = new List<int> { 0, 1, 2, 3 };
 
@@ -47,8 +47,7 @@ namespace TestBolilleros
         [Fact]
         public void Jugar_JugadaPerdedora_421_Pierde()
         {
-            // AzarFijo(0) saca siempre el primero de la lista ordenada: 0, 1, 2...
-            // La jugada empieza por 4, nunca va a matchear con 0
+            //Se verifica la jugada, en este caso; la jugada no coincide con las bolillas sacadas por el bolillero
             Bolillero miBolillero = new Bolillero(10, new AzarFijo(0));
             List<int> jugada = new List<int> { 4, 2, 1 };
 
@@ -60,6 +59,7 @@ namespace TestBolilleros
         [Fact]
         public void JugarNVeces_Jugada01_1Vez_Gana1Vez()
         {
+            //Se verifican la cantidad de veces que se jugo en el bolillero
             Bolillero miBolillero = new Bolillero(10, new AzarFijo(0));
             List<int> jugada = new List<int> { 0, 1 };
 
@@ -68,11 +68,11 @@ namespace TestBolilleros
             Assert.Equal(1, aciertos);
         }
 
-        // ─── TP2: Tests de Simulacion ───────────────────────────────────────────────
 
         [Fact]
         public void SimularSinHilos_JugadaSegura_DevuelveNAciertos()
         {
+            //Se ve la cantidad de veces que se simulo la jugada, en este caso son 100. Hace una simulacion por vez 
             Bolillero miBolillero = new Bolillero(10, new AzarFijo(0));
             Simulacion sim = new Simulacion(miBolillero);
             List<int> jugada = new List<int> { 0, 1, 2 };
@@ -85,6 +85,7 @@ namespace TestBolilleros
         [Fact]
         public void SimularConHilos_JugadaSegura_DevuelveNAciertos()
         {
+            //Se hace una simulacion con hilis, lo que permite hacer varias simulaciones al mismo tiempo. 
             Bolillero miBolillero = new Bolillero(10, new AzarFijo(0));
             Simulacion sim = new Simulacion(miBolillero);
             List<int> jugada = new List<int> { 0, 1, 2 };
@@ -97,10 +98,10 @@ namespace TestBolilleros
         [Fact]
         public void Clone_BolilleroClonado_EsIndependienteDelOriginal()
         {
+            //Se hace un clon del bolillero, donde modifica este mismo pero el original queda igual 
             Bolillero original = new Bolillero(10, new AzarFijo(0));
             Bolillero clon = (Bolillero)original.Clone();
 
-            // Sacar bolillas del clon no debe afectar al original
             clon.SacarBolilla();
 
             Assert.Equal(10, original.CantidadDentro());
