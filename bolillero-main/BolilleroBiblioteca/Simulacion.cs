@@ -31,12 +31,12 @@ public class Simulacion
         {
             int jugadasDeEsteHilo = jugadasPorHilo + (i == cantidadHilos - 1 ? resto : 0);
 
-            tareas[i] = Task.Run(() =>
+            tareas[i] = Task.Run(() => // ya no abria paralelismo
             {
                 long aciertosLocales = 0;
                 for (int j = 0; j < jugadasDeEsteHilo; j++)
                 {
-                    var clon = (Bolillero)_bolillero.Clone();
+                    var clon = (Bolillero)_bolillero.Clone(); //hilos bolilleros 
                     if (clon.Jugar(jugada))
                         aciertosLocales++;
                 }
