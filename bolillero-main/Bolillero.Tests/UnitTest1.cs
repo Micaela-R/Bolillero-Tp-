@@ -8,7 +8,7 @@ namespace TestBolilleros
     {
 
         [Fact]
-        public void SacarBolilla_DevuelveBolillaCero_YActualizaCantidades() //Se crea el objeto tomando en cuenta la clase "Boliullero", esto verifica las bolillas fuera y dentro del bolillero
+        public void SacarBolilla_DevuelveBolillaCero_YActualizaCantidades() //Se crea el objeto tomando en cuenta la clase "Bolillero", esto verifica las bolillas fuera y dentro del bolillero
         {
             Bolillero miBolillero = new Bolillero(10, new AzarFijo(0));
 
