@@ -4,14 +4,13 @@ using System.Linq;
 
 namespace Biblioteca
 {
-    // Agregamos ICloneable a la firma de la clase
     public class Bolillero : ICloneable
     {
         private List<int> bolillasDentro;
         private List<int> bolillasFuera;
         private IAzar azar;
+        private readonly object _lock = new object();
 
-        // Constructor principal que pide el test
         public Bolillero(int cantidadBolillas, IAzar azar)
         {
             this.bolillasDentro = Enumerable.Range(0, cantidadBolillas).ToList();
@@ -19,10 +18,8 @@ namespace Biblioteca
             this.azar = azar;
         }
 
-        // Constructor privado utilizado internamente para clonar de forma segura
         private Bolillero(List<int> bolillasDentro, List<int> bolillasFuera, IAzar azar)
         {
-            // Creamos nuevas instancias de listas para que sean completamente independientes del original
             this.bolillasDentro = new List<int>(bolillasDentro);
             this.bolillasFuera = new List<int>(bolillasFuera);
             this.azar = azar;
@@ -32,10 +29,10 @@ namespace Biblioteca
         {
             int indice = azar.ObtenerIndice(bolillasDentro.Count);
             int bolilla = bolillasDentro[indice];
-            
+
             bolillasDentro.RemoveAt(indice);
             bolillasFuera.Add(bolilla);
-            
+
             return bolilla;
         }
 
@@ -46,7 +43,7 @@ namespace Biblioteca
         }
 
         public int CantidadDentro() => bolillasDentro.Count;
-        
+
         public int CantidadFuera() => bolillasFuera.Count;
 
         public bool Jugar(List<int> jugada)
@@ -59,15 +56,18 @@ namespace Biblioteca
             return true;
         }
 
+        // El lock garantiza que cada hilo ejecuta su ronda completa (reingresar + jugar)
+        // de forma atómica, sin que otro hilo interfiera con el estado del bolillero.
         public int JugarNVeces(List<int> jugada, int cantidad)
         {
             int victorias = 0;
             for (int i = 0; i < cantidad; i++)
             {
-                ReingresarBolillas();
-                if (Jugar(jugada))
+                lock (_lock)
                 {
-                    victorias++;
+                    ReingresarBolillas();
+                    if (Jugar(jugada))
+                        victorias++;
                 }
             }
             return victorias;

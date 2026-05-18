@@ -7,7 +7,6 @@ public class Simulacion
     public Simulacion(Bolillero bolillero) => _bolillero = bolillero;
 
     // Simula jugando n veces de forma secuencial, sin hilos.
-    // Aprovecha JugarNVeces sobre un único clon para toda la simulación.
     public long SimularSinHilos(List<int> jugada, int cantidadVeces)
     {
         var clon = (Bolillero)_bolillero.Clone();
@@ -15,7 +14,6 @@ public class Simulacion
     }
 
     // Simula jugando n veces repartiendo el trabajo en varios hilos (síncrono).
-    // Cada hilo recibe su propio clon y llama a JugarNVeces con su porción de trabajo.
     public long SimularConHilos(List<int> jugada, int cantidadVeces, int cantidadHilos)
     {
         int jugadasPorHilo = cantidadVeces / cantidadHilos;
@@ -25,21 +23,18 @@ public class Simulacion
 
         for (int i = 0; i < cantidadHilos; i++)
         {
-            // El último hilo absorbe el resto si la división no es exacta
             int jugadasDeEsteHilo = jugadasPorHilo + (i == cantidadHilos - 1 ? resto : 0);
-
-            // Capturamos el clon fuera del lambda para evitar closures problemáticas
             var clon = (Bolillero)_bolillero.Clone();
             tareas[i] = Task.Run(() => (long)clon.JugarNVeces(jugada, jugadasDeEsteHilo));
         }
 
         Task.WaitAll(tareas);
-
         return tareas.Sum(t => t.Result);
     }
 
-    // Simula jugando n veces con async/await, repartiendo el trabajo en varios hilos.
-    // Cada hilo recibe su propio clon y llama a JugarNVeces con su porción de trabajo.
+    // Simula jugando n veces con async/await, llamando a JugarNVeces directamente
+    // sobre el bolillero original. El lock dentro de JugarNVeces garantiza
+    // que cada ronda (reingresar + jugar) sea atómica entre los hilos concurrentes.
     public async Task<long> SimularConHilosAsync(List<int> jugada, int cantidadVeces, int cantidadHilos)
     {
         int jugadasPorHilo = cantidadVeces / cantidadHilos;
@@ -49,17 +44,14 @@ public class Simulacion
 
         for (int i = 0; i < cantidadHilos; i++)
         {
-            // El último hilo absorbe el resto si la división no es exacta
             int jugadasDeEsteHilo = jugadasPorHilo + (i == cantidadHilos - 1 ? resto : 0);
 
-            // Cada hilo trabaja con su propio clon, sin concurrencia sobre el bolillero
-            var clon = (Bolillero)_bolillero.Clone();
-            tareas[i] = Task.Run(() => (long)clon.JugarNVeces(jugada, jugadasDeEsteHilo));
+            // Todos los hilos comparten _bolillero directamente (sin clonar).
+            // El lock en JugarNVeces protege el estado compartido.
+            tareas[i] = Task.Run(() => (long)_bolillero.JugarNVeces(jugada, jugadasDeEsteHilo));
         }
 
-        // Await asíncrono de todas las tareas y suma de resultados
         long[] resultados = await Task.WhenAll(tareas);
-
         return resultados.Sum();
     }
 }
