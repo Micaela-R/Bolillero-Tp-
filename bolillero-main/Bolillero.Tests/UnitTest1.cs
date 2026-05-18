@@ -1,4 +1,4 @@
-﻿using Biblioteca;
+using Biblioteca;
 using System.Collections.Generic;
 using Xunit;
 
@@ -59,7 +59,7 @@ namespace TestBolilleros
         [Fact]
         public void JugarNVeces_Jugada01_1Vez_Gana1Vez()
         {
-            //Se verifican la cantidad de veces que se jugo en el bolillero
+            //Se verifican la cantidad de veces que se jugó en el bolillero
             Bolillero miBolillero = new Bolillero(10, new AzarFijo(0));
             List<int> jugada = new List<int> { 0, 1 };
 
@@ -72,7 +72,7 @@ namespace TestBolilleros
         [Fact]
         public void SimularSinHilos_JugadaSegura_DevuelveNAciertos()
         {
-            //Se ve la cantidad de veces que se simulo la jugada, en este caso son 100. Hace una simulacion por vez 
+            //Se ve la cantidad de veces que se simuló la jugada, en este caso son 100. Hace una simulación por vez 
             Bolillero miBolillero = new Bolillero(10, new AzarFijo(0));
             Simulacion sim = new Simulacion(miBolillero);
             List<int> jugada = new List<int> { 0, 1, 2 };
@@ -85,7 +85,7 @@ namespace TestBolilleros
         [Fact]
         public void SimularConHilos_JugadaSegura_DevuelveNAciertos()
         {
-            //Se hace una simulacion con hilis, lo que permite hacer varias simulaciones al mismo tiempo. 
+            //Se hace una simulación con hilos, lo que permite hacer varias simulaciones al mismo tiempo. 
             Bolillero miBolillero = new Bolillero(10, new AzarFijo(0));
             Simulacion sim = new Simulacion(miBolillero);
             List<int> jugada = new List<int> { 0, 1, 2 };
@@ -106,6 +106,19 @@ namespace TestBolilleros
 
             Assert.Equal(10, original.CantidadDentro());
             Assert.Equal(9, clon.CantidadDentro());
+        }
+
+        [Fact]
+        public async Task SimularConHilosAsync_JugadaSegura_DevuelveNAciertos()
+        {
+            // Se verifica que la versión async con hilos devuelve el mismo resultado que las otras dos
+            Bolillero miBolillero = new Bolillero(10, new AzarFijo(0));
+            Simulacion sim = new Simulacion(miBolillero);
+            List<int> jugada = new List<int> { 0, 1, 2 };
+
+            long aciertos = await sim.SimularConHilosAsync(jugada, 100, 4);
+
+            Assert.Equal(100, aciertos);
         }
     }
 }
